@@ -33,6 +33,7 @@ module Conv2d #(
 endmodule
 
 
+
 module MaxPool #(
     parameter STRIDE = 2,
     parameter INPUT_SIZE = 4
@@ -68,6 +69,7 @@ module MaxPool #(
         end
     end
 endmodule
+
 
 
 module FC #(
