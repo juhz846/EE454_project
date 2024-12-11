@@ -1,28 +1,29 @@
 module backpropagation (
     input clk,
     input rst,
-    input [15:0] fc_out[0:9],         // FC output logits
-    input [15:0] one_hot_label[0:9], // One-hot encoded label
-    input [15:0] fc_in[0:195],       // Input to FullyConnected layer
-    input [15:0] learning_rate,      // Learning rate
-    output reg [15:0] weight_update[0:195][0:9], // Weight updates
-    output reg [15:0] bias_update[0:9]           // Bias updates
+    input [16*10-1:0] fc_out,         // Flattened FC layer output (10 elements, 16 bits each)
+    input [16*10-1:0] one_hot_label, // Flattened one-hot encoded label (10 elements, 16 bits each)
+    input [16*196-1:0] fc_in,        // Flattened FC input (196 elements, 16 bits each)
+    input [15:0] learning_rate,      // Learning rate (single 16-bit value)
+    output reg [16*1960-1:0] weight_update, // Flattened weight updates (196x10)
+    output reg [16*10-1:0] bias_update      // Bias updates (10 elements, 16 bits each)
 );
     integer i, j;
+    reg [15:0] temp_error;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             for (i = 0; i < 10; i = i + 1) begin
-                bias_update[i] <= 0;
+                bias_update[i*16 +: 16] <= 16'd0;
                 for (j = 0; j < 196; j = j + 1)
-                    weight_update[j][i] <= 0;
+                    weight_update[(i*196 + j)*16 +: 16] <= 16'd0;
             end
         end else begin
-            // Calculate weight and bias updates
             for (i = 0; i < 10; i = i + 1) begin
-                bias_update[i] <= learning_rate * (fc_out[i] - one_hot_label[i]);
+                temp_error = fc_out[i*16 +: 16] - one_hot_label[i*16 +: 16];
+                bias_update[i*16 +: 16] <= learning_rate * temp_error;
                 for (j = 0; j < 196; j = j + 1) begin
-                    weight_update[j][i] <= learning_rate * (fc_out[i] - one_hot_label[i]) * fc_in[j];
+                    weight_update[(i*196 + j)*16 +: 16] <= learning_rate * temp_error * fc_in[j*16 +: 16];
                 end
             end
         end
