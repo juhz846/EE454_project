@@ -117,6 +117,13 @@ module cnn_top (
                     // Perform backward propagation
                     // Compute error gradients (error = fc_out - one-hot(label))
                     // Update weights using backpropagation
+                    for (i = 0; i < 1960; i = i + 1) begin
+                        weights[i*16 +: 16] <= weights[i*16 +: 16] - weight_update[i*16 +: 16];
+                    end
+                    for (j = 0; j < 10; j = j + 1) begin
+                        biases[j*16 +: 16] <= biases[j*16 +: 16] - bias_update[j*16 +: 16];
+                    end
+
                     state <= OUTPUT_RESULTS;
                 end
                 OUTPUT_RESULTS: begin
