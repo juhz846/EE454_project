@@ -2,7 +2,7 @@ module cnn_top (
     input clk,
     input rst,
     input [8*784-1:0] image_data,    // Flattened 28x28 input image (8 bits per pixel)
-    input [3:0] label,               // Ground truth label (4 bits, integer 0-9)
+    input [7:0] label,               // Ground truth label (4 bits, integer 0-9)
     input start,                     // Signal to start the CNN pipeline
     output reg [3:0] classification, // Predicted label (4 bits, integer 0-9)
     output reg done                  // Signal indicating completion of forward/backpropagation
@@ -96,6 +96,8 @@ module cnn_top (
                 one_hot_label[i*16 +: 16] = 16'd0;  // All other bits are 0
         end
     end
+
+    integer counter = 0;
 
     // Control Logic for State Machine
     always @(posedge clk or posedge rst) begin
