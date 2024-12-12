@@ -38,13 +38,15 @@ module cnn_tb;
         #10 rst = 0;
 
         // Load a single MNIST example from a text file (or predefined data)
-        $readmemb("mnist_data.txt", mnist_image); // Load image data into `mnist_image`
+        $readmemb("mnist_data_1.txt", mnist_image); // Load image data into `mnist_image`
         mnist_label = mnist_image[783];          // Extract the label from the last byte
         label = mnist_label;                     // Assign to testbench label signal
 
         // Flatten the image data into a single vector for `image_data`
         for (i = 0; i < 784; i = i + 1) begin
             image_data[i*8 +: 8] = mnist_image[i];
+            $display("mnist_image[%d]: %d", i, mnist_image[i]);
+
         end
 
         // Start the CNN pipeline
